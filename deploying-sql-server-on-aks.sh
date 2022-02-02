@@ -3,71 +3,210 @@ az login
 az group create --location australiaeast \
                 --name sqltestharg
 
+# {
+#   "id": "/subscriptions/44444/resourceGroups/sqltestharg",
+#   "location": "australiaeast",
+#   "managedBy": null,
+#   "name": "sqltestharg",
+#   "properties": {
+#     "provisioningState": "Succeeded"
+#   },
+#   "tags": null,
+#   "type": "Microsoft.Resources/resourceGroups"
+# }
+
+
 az aks create \
     --resource-group sqltestharg \
     --name sqlakscluster \
     --node-count 3 \
+    --node-vm-size=Standard_B2ms \
     --generate-ssh-keys
+
+# {
+#   "aadProfile": null,
+#   "addonProfiles": null,
+#   "agentPoolProfiles": [
+#     {
+#       "availabilityZones": null,
+#       "count": 3,
+#       "enableAutoScaling": false,
+#       "enableEncryptionAtHost": false,
+#       "enableFips": false,
+#       "enableNodePublicIp": false,
+#       "enableUltraSsd": false,
+#       "gpuInstanceProfile": null,
+#       "kubeletConfig": null,
+#       "kubeletDiskType": "OS",
+#       "linuxOsConfig": null,
+#       "maxCount": null,
+#       "maxPods": 110,
+#       "minCount": null,
+#       "mode": "System",
+#       "name": "nodepool1",
+#       "nodeImageVersion": "AKSUbuntu-1804gen2containerd-2022.01.19",
+#       "nodeLabels": null,
+#       "nodePublicIpPrefixId": null,
+#       "nodeTaints": null,
+#       "orchestratorVersion": "1.21.7",
+#       "osDiskSizeGb": 128,
+#       "osDiskType": "Managed",
+#       "osSku": "Ubuntu",
+#       "osType": "Linux",
+#       "podSubnetId": null,
+#       "powerState": {
+#         "code": "Running"
+#       },
+#       "provisioningState": "Succeeded",
+#       "proximityPlacementGroupId": null,
+#       "scaleDownMode": null,
+#       "scaleSetEvictionPolicy": null,
+#       "scaleSetPriority": null,
+#       "spotMaxPrice": null,
+#       "tags": null,
+#       "type": "VirtualMachineScaleSets",
+#       "upgradeSettings": null,
+#       "vmSize": "Standard_B2ms",
+#       "vnetSubnetId": null
+#     }
+#   ],
+#   "apiServerAccessProfile": null,
+#   "autoScalerProfile": null,
+#   "autoUpgradeProfile": null,
+#   "azurePortalFqdn": "sqlaksclus-sqltestharg-d084e8-5f7d702f.portal.hcp.australiaeast.azmk8s.io",
+#   "disableLocalAccounts": false,
+#   "diskEncryptionSetId": null,
+#   "dnsPrefix": "sqlaksclus-sqltestharg-d084e8",
+#   "enablePodSecurityPolicy": null,
+#   "enableRbac": true,
+#   "extendedLocation": null,
+#   "fqdn": "sqlaksclus-sqltestharg-d084e8-5f7d702f.hcp.australiaeast.azmk8s.io",
+#   "fqdnSubdomain": null,
+#   "httpProxyConfig": null,
+#   "id": "/subscriptions/d084e879-5a0c-4401-861d-9b4b0436771b/resourcegroups/sqltestharg/providers/Microsoft.ContainerService/managedClusters/sqlakscluster",
+#   "identity": {
+#     "principalId": "8f28e2c5-5b73-4942-9293-7b295281124d",
+#     "tenantId": "b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0",
+#     "type": "SystemAssigned",
+#     "userAssignedIdentities": null
+#   },
+#   "identityProfile": {
+#     "kubeletidentity": {
+#       "clientId": "02d21bba-1252-45e9-9478-c7719b1d66a5",
+#       "objectId": "fb88ada4-bbda-49ba-8021-d443becbb59e",
+#       "resourceId": "/subscriptions/d084e879-5a0c-4401-861d-9b4b0436771b/resourcegroups/MC_sqltestharg_sqlakscluster_australiaeast/providers/Microsoft.ManagedIdentity/userAssignedIdentities/sqlakscluster-agentpool"
+#     }
+#   },
+#   "kubernetesVersion": "1.21.7",
+#   "linuxProfile": {
+#     "adminUsername": "azureuser",
+#     "ssh": {
+#       "publicKeys": [
+#         {
+#           "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXycEfFRbKFoYQ35DjWCY3vK2qo0cWehSAnHokBIU7mOrYSNR6IVl47KPf/dOTj+mGStatry3iBkcf3dJP0dFTXqpPFJk5gDOHDo2zbIPQrGVHnR64eOst8XN/SwV6R51t328xyci4IFgxKGUPxl11BlLv4j9Paks+n09g2IQYGZvL8KJr6q/WIQMVeemHy8EykM+vvjSfkRjbZNXb5mjQQrK4oyhRELojX9q2Rn7kGzy3uffaS0oFoyhmMLw0lprKY3CN3P2b1stkSc/4Ff/2aExw+GsOXruPHR8mI2VQmliHTUBV/X6LPGDFAnlrXYM09qVSluacIoFi0GvArvZc1OnqMRVANuAS0etTpoWbOtxX8BQEpdp2+12a4xCIIQQdY7e4st8ui8yuhTo1zGb8/PWa17u8CfvU2lSXaopqowvtVJfya1YE2d9iaOxMoXpxGMZ5OILTgOiI68OM9GpYW/9r20L+8y529vsMkUB5/jp85pnnQXms+U48Wg8yEwszPFze+t6QVAsXoBJkEZkuvGxPjobZcpUAfCTiHEP66hIy0uDybDhJn37YDdnuNbnvltoy2Fr9mP5+hDGxh7GcU2AVro8Jp1QE8PjDbyKK1pYbz5telgTF03Knp2pjKsOObywAhq3Q/fv9LtyBswKLXtOMKCT2S2Yp6LFP/7zBtQ== email@example.com\n"
+#         }
+#       ]
+#     }
+#   },
+#   "location": "australiaeast",
+#   "maxAgentPools": 100,
+#   "name": "sqlakscluster",
+#   "networkProfile": {
+#     "dnsServiceIp": "10.0.0.10",
+#     "dockerBridgeCidr": "172.17.0.1/16",
+#     "loadBalancerProfile": {
+#       "allocatedOutboundPorts": null,
+#       "effectiveOutboundIPs": [
+#         {
+#           "id": "/subscriptions/d084e879-5a0c-4401-861d-9b4b0436771b/resourceGroups/MC_sqltestharg_sqlakscluster_australiaeast/providers/Microsoft.Network/publicIPAddresses/1b8688da-4eed-404d-9995-cec2e8091cb0",
+#           "resourceGroup": "MC_sqltestharg_sqlakscluster_australiaeast"
+#         }
+#       ],
+#       "idleTimeoutInMinutes": null,
+#       "managedOutboundIPs": {
+#         "count": 1
+#       },
+#       "outboundIPs": null,
+#       "outboundIpPrefixes": null
+#     },
+#     "loadBalancerSku": "Standard",
+#     "natGatewayProfile": null,
+#     "networkMode": null,
+#     "networkPlugin": "kubenet",
+#     "networkPolicy": null,
+#     "outboundType": "loadBalancer",
+#     "podCidr": "10.244.0.0/16",
+#     "serviceCidr": "10.0.0.0/16"
+#   },
+#   "nodeResourceGroup": "MC_sqltestharg_sqlakscluster_australiaeast",
+#   "podIdentityProfile": null,
+#   "powerState": {
+#     "code": "Running"
+#   },
+#   "privateFqdn": null,
+#   "privateLinkResources": null,
+#   "provisioningState": "Succeeded",
+#   "resourceGroup": "sqltestharg",
+#   "securityProfile": null,
+#   "servicePrincipalProfile": {
+#     "clientId": "msi",
+#     "secret": null
+#   },
+#   "sku": {
+#     "name": "Basic",
+#     "tier": "Free"
+#   },
+#   "tags": null,
+#   "type": "Microsoft.ContainerService/ManagedClusters",
+#   "windowsProfile": null
+# }
+
 
 az aks get-credentials --resource-group sqltestharg --name sqlakscluster
 # /home/pradeepl/.kube/config has permissions "644".
 # It should be readable and writable only by its owner.
 # Merged "sqlakscluster" as current context in /home/pradeepl/.kube/config
-kubectl create secret generic mssql --from-literal=SA_PASSWORD="MyC0m9l&xP@ssw0rd"
+
+# List nodes
+kubectl get nodes
+# List Pods
+kubectl get pods
+
+# create storageclass, volumes and volume claims for primary and secondaries
+kubectl apply -f storageclass.yaml --record
+kubectl apply -f pvc-primary.yaml --record
+kubectl apply -f pvc-secondaryone.yaml --record
+kubectl apply -f pvc-secondarytwo.yaml --record
+
+# Display the persistent volume and claim
+kubectl get pv
+# NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                      STORAGECLASS   REASON   AGE
+# pvc-232cc16c-f048-473b-87b1-e1ffcb63ba89   8Gi        RWO            Delete           Bound    default/mssql-primary      azure-disk              3s
+# pvc-e151eb5c-8265-4913-b4b4-dbb54ca614bb   8Gi        RWO            Delete           Bound    default/mssql-secondary1   azure-disk              2s
+
+kubectl get pvc
+# NAME               STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+# mssql-primary      Bound    pvc-232cc16c-f048-473b-87b1-e1ffcb63ba89   8Gi        RWO            azure-disk     30s
+# mssql-secondary1   Bound    pvc-e151eb5c-8265-4913-b4b4-dbb54ca614bb   8Gi        RWO            azure-disk     27s
+# mssql-secondary2   Bound    pvc-22003522-dda2-4e77-a46e-798e2631720d   8Gi        RWO            azure-disk     25s
+
+
+kubectl create secret generic mssql-secret --from-literal=SA_PASSWORD="MySQLP@ssw0rdF0r@zure"
 #secret/mssql created
 
-kubectl apply -f pvc.yaml
-# deployment.apps/mssql-deployment created
-# service/mssql-deployment created
-kubectl describe pvc mssql-data
-# Name:          mssql-data
-# Namespace:     default
-# StorageClass:  azure-disk
-# Status:        Bound
-# Volume:        pvc-83620ee8-dd55-400b-abf5-9cd8cb499da2
-# Labels:        <none>
-# Annotations:   pv.kubernetes.io/bind-completed: yes
-#                pv.kubernetes.io/bound-by-controller: yes
-#                volume.beta.kubernetes.io/storage-class: azure-disk
-#                volume.beta.kubernetes.io/storage-provisioner: disk.csi.azure.com
-# Finalizers:    [kubernetes.io/pvc-protection]
-# Capacity:      8Gi
-# Access Modes:  RWO
-# VolumeMode:    Filesystem
-# Used By:       mssql-deployment-cdc47fc9b-8jfg9
-# Events:
-#   Type    Reason                 Age                    From                                                                                               Message
-#   ----    ------                 ----                   ----                                                                                               -------
-#   Normal  Provisioning           3m37s                  disk.csi.azure.com_csi-azuredisk-controller-8679485599-wqwkg_cdbbfe58-be29-4951-bd5c-6f988d6d793f  External provisioner is provisioning volume for claim "default/mssql-data"
-#   Normal  ExternalProvisioning   3m34s (x2 over 3m37s)  persistentvolume-controller                                                                        waiting for a volume to be created, either by external provisioner "disk.csi.azure.com" or manually created by system administrator
-#   Normal  ProvisioningSucceeded  3m33s                  disk.csi.azure.com_csi-azuredisk-controller-8679485599-wqwkg_cdbbfe58-be29-4951-bd5c-6f988d6d793f  Successfully provisioned volume pvc-83620ee8-dd55-400b-abf5-9cd8cb499da2
-kubectl describe pv
-# Name:              pvc-83620ee8-dd55-400b-abf5-9cd8cb499da2
-# Labels:            <none>
-# Annotations:       pv.kubernetes.io/provisioned-by: disk.csi.azure.com
-# Finalizers:        [kubernetes.io/pv-protection external-attacher/disk-csi-azure-com]
-# StorageClass:      azure-disk
-# Status:            Bound
-# Claim:             default/mssql-data
-# Reclaim Policy:    Delete
-# Access Modes:      RWO
-# VolumeMode:        Filesystem
-# Capacity:          8Gi
-# Node Affinity:     
-#   Required Terms:  
-#     Term 0:        topology.disk.csi.azure.com/zone in []
-# Message:           
-# Source:
-#     Type:         AzureDisk (an Azure Data Disk mount on the host and bind mount to the pod)
-#     DiskName:     pvc-83620ee8-dd55-400b-abf5-9cd8cb499da2
-#     DiskURI:      /subscriptions/d084e879-5a0c-4401-861d-9b4b0436771b/resourceGroups/mc_sqltestharg_sqlakscluster_australiaeast/providers/Microsoft.Compute/disks/pvc-83620ee8-dd55-400b-abf5-9cd8cb499da2
-#     Kind:         Managed
-#     FSType:       
-#     CachingMode:  ReadWrite
-#     ReadOnly:     false
-# Events:           <none>
-
-kubectl apply -f sqldeployment.yaml
+# Deploy the SQL Server 2019 container
+ 
+# Primary Replica Deployment
+kubectl apply -f SQLPrimaryAGDeployment.yaml --record
+ 
+# Secondary Replica1 Deployment
+kubectl apply -f SQLSecondaryAGOneDeployment.yaml --record
+ 
+# Secondary Replica2 Deployment
+kubectl apply -f SQLSecondaryAGTwoDeployment.yaml --record
+ 
+# Get the status of the nodes, pods and service
+kubectl get all
 
 kubectl get pods
 # NAME                               READY   STATUS              RESTARTS   AGE
