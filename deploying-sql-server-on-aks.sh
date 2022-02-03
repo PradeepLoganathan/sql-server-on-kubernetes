@@ -207,17 +207,126 @@ kubectl apply -f SQLSecondaryAGTwoDeployment.yaml --record
  
 # Get the status of the nodes, pods and service
 kubectl get all
+# NAME                                                 READY   STATUS    RESTARTS   AGE
+# pod/mssqlag-primary-deployment-77b8974bb9-dbltl      1/1     Running   0          93s
+# pod/mssqlag-secondary1-deployment-74695cf469-lgddj   1/1     Running   0          89s
+# pod/mssqlag-secondary2-deployment-5ff7f7cfc7-jcdsl   1/1     Running   0          86s
+
+# NAME                       TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                         AGE
+# service/kubernetes         ClusterIP      10.0.0.1       <none>          443/TCP                         4m52s
+# service/mssql-primary      LoadBalancer   10.0.134.166   20.40.177.215   1433:30320/TCP,5022:32275/TCP   94s
+# service/mssql-secondary1   LoadBalancer   10.0.13.117    20.40.179.81    1433:31559/TCP,5022:30767/TCP   89s
+# service/mssql-secondary2   LoadBalancer   10.0.176.255   20.188.221.93   1433:32192/TCP,5022:32703/TCP   87s
+
+# NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+# deployment.apps/mssqlag-primary-deployment      1/1     1            1           94s
+# deployment.apps/mssqlag-secondary1-deployment   1/1     1            1           90s
+# deployment.apps/mssqlag-secondary2-deployment   1/1     1            1           87s
+
+# NAME                                                       DESIRED   CURRENT   READY   AGE
+# replicaset.apps/mssqlag-primary-deployment-77b8974bb9      1         1         1       94s
+# replicaset.apps/mssqlag-secondary1-deployment-74695cf469   1         1         1       90s
+# replicaset.apps/mssqlag-secondary2-deployment-5ff7f7cfc7   1         1         1       87s
 
 kubectl get pods
-# NAME                               READY   STATUS              RESTARTS   AGE
-# mssql-deployment-cdc47fc9b-8jfg9   0/1     ContainerCreating   0          17s
+# mssqlag-primary-deployment-77b8974bb9-dbltl      1/1     Running   0          2m2s
+# mssqlag-secondary1-deployment-74695cf469-lgddj   1/1     Running   0          118s
+# mssqlag-secondary2-deployment-5ff7f7cfc7-jcdsl   1/1     Running   0          115s
 
 kubectl get services
-# NAME               TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
-# kubernetes         ClusterIP      10.0.0.1       <none>          443/TCP          4m53s
-# mssql-deployment   LoadBalancer   10.0.126.217   20.92.153.183   1433:30885/TCP   53s
+NAME               TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                         AGE
+kubernetes         ClusterIP      10.0.0.1       <none>          443/TCP                         5m41s
+mssql-primary      LoadBalancer   10.0.134.166   20.40.177.215   1433:30320/TCP,5022:32275/TCP   2m23s
+mssql-secondary1   LoadBalancer   10.0.13.117    20.40.179.81    1433:31559/TCP,5022:30767/TCP   2m18s
+mssql-secondary2   LoadBalancer   10.0.176.255   20.188.221.93   1433:32192/TCP,5022:32703/TCP   2m16s
+
+###https://rajanieshkaushikk.com/2021/05/03/deploying-sql-server-always-on-availability-group-on-azure-kubernetes-servicesaks/
+###https://sqlundercover.com/2017/09/19/7-ways-to-query-always-on-availability-groups-using-sql/
+ip1=$(kubectl get service mssql-primary --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+ip2=$(kubectl get service mssql-secondary1 --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+ip3=$(kubectl get service mssql-secondary2 --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+echo IP addresses of the replicas  $ip1, $ip2, $ip3
+
+sqlcmd -S 20.40.177.215 -U sa -P "MySQLP@ssw0rdF0r@zure" -i AG1-Primary-CreateandAdd.sql
+# Changed database context to 'master'.
+# Changed database context to 'SQLTestAG'.
+
+# (3 rows affected)
+# 12 percent processed.
+# 22 percent processed.
+# 31 percent processed.
+# 41 percent processed.
+# 51 percent processed.
+# 61 percent processed.
+# 71 percent processed.
+# 80 percent processed.
+# 90 percent processed.
+# 100 percent processed.
+# Processed 336 pages for database 'SQLTestAG', file 'SQLTestAG' on file 1.
+# Processed 2 pages for database 'SQLTestAG', file 'SQLTestAG_log' on file 1.
+# BACKUP DATABASE successfully processed 338 pages in 0.230 seconds (11.463 MB/sec).
+# Changed database context to 'master'.
+# Changed database context to 'master'.
+
+# once the Primary database is created and the certificates are done we need to copy it over to the secondary sql servers.
 
 
+sqlcmd -S 20.40.179.81 -U sa -P "MySQLP@ssw0rdF0r@zure" -i AG2-Secondary-CreateandAdd.sql
+
+sqlcmd -S 20.188.221.93 -U sa -P "MySQLP@ssw0rdF0r@zure" -i AG3-Secondary-CreateandAdd.sql -o output.txt
+
+#Create Primary & secondary replicas from SQL script and create certificates in 
+#Primary replica 
+
+kubectl exec mssqlag-primary-deployment-77b8974bb9-dbltl -- ls -la /var/opt/mssql
+# total 52
+# drwxrwsr-x 8 root  10001  4096 Feb  3 02:05 .
+# drwxr-xr-x 1 root  root   4096 Jan 22 05:18 ..
+# drwxr-sr-x 5 mssql 10001  4096 Feb  2 04:10 .system
+# -rw-r----- 1 mssql 10001   689 Feb  3 02:05 ag_certificate.cert
+# -rw-r----- 1 mssql 10001  1212 Feb  3 02:05 ag_certificate.key
+# drwxr-sr-x 2 mssql 10001  4096 Feb  3 02:05 backup
+# drwxr-sr-x 2 mssql 10001  4096 Feb  3 02:05 data
+# drwxr-sr-x 2 mssql 10001  4096 Feb  2 04:10 log
+# drwxrws--- 2 root  10001 16384 Feb  2 04:09 lost+found
+# drwxr-sr-x 2 mssql 10001  4096 Feb  2 04:10 secrets
+
+### certificate and key exist
+ 
+# Now Copy the certificates from the  primary to the local
+# First Retrieve pod name to variable
+# podagp=$(kubectl get pods -l app=mssql-primary -o custom-columns=:metadata.name)
+# podags1=$(kubectl get pods -l app=mssql-secondary1 -o custom-columns=:metadata.name)
+# podags2=$(kubectl get pods -l app=mssql-secondary2 -o custom-columns=:metadata.name)
+
+
+podagp=$(kubectl get pods -l app=mssql-primary -o json | jq -r '.items[0].metadata.name')
+podags1=$(kubectl get pods -l app=mssql-secondary1 -o json | jq -r '.items[0].metadata.name')
+podags2=$(kubectl get pods -l app=mssql-secondary2 -o json | jq -r '.items[0].metadata.name')
+
+
+###Under Linux, endpoints for an AG are only supported if certificates are used for authentication. 
+###This means that the certificate from one instance must be restored on all other instances that will be replicas participating in the same AG.
+#prepare variables
+
+PathToCopyCert=${podagp}":var/opt/mssql/ag_certificate.cert"
+PathToCopyCertKey=${podagp}":var/opt/mssql/ag_certificate.key"
+
+
+# First copy to local
+kubectl cp $podagp:var/opt/mssql/ag_certificate.cert ag_certificate.cert
+kubectl cp $podagp:var/opt/mssql/ag_certificate.key ag_certificate.key
+
+# Copy the certificate from local host to secondary1
+echo Copying AG certificates from localhost to pod $podags1
+kubectl cp ag_certificate.cert  $podags1:var/opt/mssql
+kubectl cp ag_certificate.key  $podags1:var/opt/mssql
+
+# Next copy to secondary2
+echo Copying AG certificates from localhost to pod $podags2
+kubectl cp ag_certificate.cert $podags2:var/opt/mssql 
+kubectl cp ag_certificate.key $podags2:var/opt/mssql
 
 kubectl logs mssql-deployment-cdc47fc9b-8jfg9
 # SQL Server 2019 will run as non-root by default.
